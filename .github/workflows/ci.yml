@@ -29,4 +29,4 @@ jobs:
           sudo chmod 666 /dev/ttys001 /dev/ttys002
 
       - name: Maven Test
-        run: ./mvnw test
+        run: mvn test
