@@ -1,0 +1,32 @@
+name: Maven CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+
+      - name: Install socat
+        run: sudo apt-get update && sudo apt-get install -y socat
+
+      - name: Create Virtual Serial Ports
+        run: |
+          nohup sudo socat -d -d pty,link=/dev/ttys001,raw,echo=0 pty,link=/dev/ttys002,raw,echo=0 > socat.log 2>&1 &
+          echo $! > socat.pid
+          sleep 3
+          cat socat.log
+          sudo chmod 666 /dev/ttys001 /dev/ttys002
+
+      - name: Maven Test
+        run: ./mvnw test
