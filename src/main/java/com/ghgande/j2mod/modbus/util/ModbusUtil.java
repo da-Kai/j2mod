@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -116,7 +117,7 @@ public class ModbusUtil {
             ret = toHex(byteOutputStream.getBuffer(), 0, byteOutputStream.size());
         }
         catch (IOException ex) {
-            logger.debug("Hex conversion error {}", ex);
+            logger.debug("Hex conversion error {}", ex.toString());
         }
         return ret;
     }
@@ -129,6 +130,9 @@ public class ModbusUtil {
      * @return a hex encoded String.
      */
     public static String toHex(byte[] data) {
+        if (data == null) {
+            return "";
+        }
         return toHex(data, 0, data.length);
     }
 
@@ -147,6 +151,9 @@ public class ModbusUtil {
      */
     public static String toHex(byte[] data, int off, int end) {
         //double size, two bytes (hex range) for one byte
+        if (data == null) {
+            return "";
+        }
         StringBuilder buf = new StringBuilder(data.length * 2);
         if (end > data.length) {
             end = data.length;
@@ -172,7 +179,7 @@ public class ModbusUtil {
      *
      * @return the generated hexadecimal representation as <code>byte[]</code>.
      */
-    public static byte[] toHex(int i) {
+    public static byte[] toHexBytes(int i) {
         StringBuilder buf = new StringBuilder(2);
         //don't forget the second hex digit
         if ((i & 0xff) < 0x10) {
@@ -180,7 +187,7 @@ public class ModbusUtil {
         }
         buf.append(Long.toString(i & 0xff, 16).toUpperCase());
         try {
-            return buf.toString().getBytes("US-ASCII");
+            return buf.toString().getBytes(StandardCharsets.US_ASCII);
         }
         catch (Exception e) {
             logger.debug("Problem converting bytes to string - {}", e.getMessage());
@@ -480,7 +487,7 @@ public class ModbusUtil {
         int[] crc = {0xFF, 0xFF};
         int nextByte;
         int uIndex; /* will index into CRC lookup*/ /* table */
-    /* pass through message buffer */
+        /* pass through message buffer */
         for (int i = offset; i < len && i < data.length; i++) {
             nextByte = 0xFF & ((int)data[i]);
             uIndex = crc[0] ^ nextByte; //*puchMsg++; /* calculate the CRC */

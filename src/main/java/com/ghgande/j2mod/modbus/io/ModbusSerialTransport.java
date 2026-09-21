@@ -543,9 +543,9 @@ public abstract class ModbusSerialTransport extends AbstractModbusTransport {
                 logger.debug("Wrote FRAME_END");
             }
             else {
-                buffer = ModbusUtil.toHex(value);
+                buffer = ModbusUtil.toHexBytes(value);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Wrote byte {}={}", value, ModbusUtil.toHex(value));
+                    logger.debug("Wrote byte {}={}", value, ModbusUtil.toHexBytes(value));
                 }
             }
             if (buffer != null) {
