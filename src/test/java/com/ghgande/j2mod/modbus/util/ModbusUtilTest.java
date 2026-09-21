@@ -16,6 +16,13 @@ public class ModbusUtilTest {
     }
 
     @Test
+    public void toHex_testOffsetGreaterEnd() {
+        byte[] data = {0x00, 0x0F};
+        assertEquals("", ModbusUtil.toHex(data, 1, 0));
+        assertEquals("", ModbusUtil.toHex(data, 3, 4));
+    }
+
+    @Test
     public void toHex_encodesBytesAsUppercaseSpaceSeparatedHex() {
         byte[] data = {0x00, 0x0F, 0x10, 0x7F, (byte) 0x80, (byte) 0xFF};
         assertEquals("00 0F 10 7F 80 FF", ModbusUtil.toHex(data));
@@ -24,28 +31,24 @@ public class ModbusUtilTest {
     @Test
     public void toHex_endExclusiveRange() {
         byte[] data = {0x00, 0x11, 0x22, 0x33, 0x44};
-
         assertEquals("11 22 33", ModbusUtil.toHex(data, 1, 4));
     }
 
     @Test
     public void toHex_supportsSingleByteRange() {
         byte[] data = {0x12, (byte) 0xAB, 0x34};
-
         assertEquals("AB", ModbusUtil.toHex(data, 1, 2));
     }
 
     @Test
     public void toHex_returnsEmptyStringForEmptyRange() {
         byte[] data = {0x12, 0x34};
-
         assertEquals("", ModbusUtil.toHex(data, 1, 1));
     }
 
     @Test
     public void toHex_clampsEndToArrayLength() {
         byte[] data = {0x12, 0x34, 0x56};
-
         assertEquals("34 56", ModbusUtil.toHex(data, 1, 99));
     }
 
