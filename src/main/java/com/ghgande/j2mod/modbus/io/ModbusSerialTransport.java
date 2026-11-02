@@ -156,6 +156,7 @@ public abstract class ModbusSerialTransport extends AbstractModbusTransport {
 
     static double calculateTransmissionTime(int charactersToTransfer,  AbstractSerialConnection commPort) {
         final double charactersPerSecond = commPort.getBaudRate() / commPort.getBitsPerCharacter();
+        return NS_IN_A_SEC * charactersToTransfer / charactersPerSecond;
     }
 
     /**
