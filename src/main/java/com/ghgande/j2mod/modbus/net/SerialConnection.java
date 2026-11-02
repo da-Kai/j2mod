@@ -48,7 +48,7 @@ public class SerialConnection extends AbstractSerialConnection {
     public static final int CONNECT_RETRY_DELAY = 100;
     public static final int CONNECT_RETRIES = 3;
 
-    private SerialParameters parameters;
+    private final SerialParameters parameters;
     private ModbusSerialTransport transport;
     private SerialPort serialPort;
     private InputStream inputStream;
@@ -58,6 +58,7 @@ public class SerialConnection extends AbstractSerialConnection {
      * Default constructor
      */
     public SerialConnection() {
+        this(new SerialParameters());
     }
 
     /**

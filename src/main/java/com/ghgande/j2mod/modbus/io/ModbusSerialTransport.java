@@ -56,12 +56,12 @@ public abstract class ModbusSerialTransport extends AbstractModbusTransport {
     /**
      * The number of nanoseconds in a millisecond
      */
-    private static final int NS_IN_A_MS = 1_000_000;
+    private static final double NS_IN_A_MS = 1_000_000.0;
 
     /**
      * The number of nanoseconds in a second
      */
-    private static final int NS_IN_A_SEC = 1_000_000_000;
+    private static final double NS_IN_A_SEC = 1_000_000_000.0;
 
     /**
      * The number of microseconds in a second.
@@ -126,7 +126,7 @@ public abstract class ModbusSerialTransport extends AbstractModbusTransport {
         if (transmissionTimeNanos >= NS_IN_A_MS) {
             try {
                 final long adjustedDelay = (long) (transmissionTimeNanos * LONG_DELAY_FUDGE_FACTOR);
-                final long sleepMillis = adjustedDelay / NS_IN_A_MS;
+                final long sleepMillis = (long) (adjustedDelay / NS_IN_A_MS);
                 final int sleepNanos = (int) (adjustedDelay % NS_IN_A_MS);
 
                 Thread.sleep(sleepMillis, sleepNanos);
@@ -154,6 +154,10 @@ public abstract class ModbusSerialTransport extends AbstractModbusTransport {
         }
     }
 
+    static double calculateTransmissionTime(int charactersToTransfer,  AbstractSerialConnection commPort) {
+        final double charactersPerSecond = commPort.getBaudRate() / commPort.getBitsPerCharacter();
+    }
+
     /**
      * Writes the request/response message to the port
      *
@@ -168,8 +172,7 @@ public abstract class ModbusSerialTransport extends AbstractModbusTransport {
             final long startTime = System.nanoTime();
 
             // Wait here for the message to have been sent
-            final double charactersPerSecond = commPort.getBaudRate() / commPort.getBitsPerCharacter();
-            final double transmissionTimeNanos = NS_IN_A_SEC * msg.getOutputLength() / charactersPerSecond;
+            final double transmissionTimeNanos = calculateTransmissionTime(msg.getOutputLength(), commPort);
             waitForTransmission(startTime, transmissionTimeNanos);
         }
         finally {
@@ -642,7 +645,7 @@ public abstract class ModbusSerialTransport extends AbstractModbusTransport {
             int delay = (int) Math.ceil(getInterFrameDelay() / 1000.0);
 
             // How long since the last message we received
-            long gapSinceLastMessage = (System.nanoTime() - lastTransactionTimestamp) / NS_IN_A_MS;
+            long gapSinceLastMessage = (long) ((System.nanoTime() - lastTransactionTimestamp) / NS_IN_A_MS);
             if (delay > gapSinceLastMessage) {
                 long sleepTime = delay - gapSinceLastMessage;
 
